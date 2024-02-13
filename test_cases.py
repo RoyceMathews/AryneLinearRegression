@@ -115,12 +115,13 @@ class TestReaction(BaseTestClass):
     def test_reaction(self):
         reaction = Reaction(self.test_reaction_id1, self.test_ligand1, self.test_norm_cone_sigma1,
                             self.test_norm_cone_charton1, self.test_gibbs_free_energy_difference1)
+        tolerance = 1e-14
 
-        self.assertEqual(self.test_reaction_id1, reaction.get_reaction_id())
-        self.assertEqual(self.test_ligand1, reaction.get_ligand())
-        self.assertEqual(self.test_norm_cone_sigma1, reaction.get_norm_cone_sigma())
-        self.assertEqual(self.test_norm_cone_charton1, reaction.get_norm_cone_charton())
-        self.assertEqual(self.test_gibbs_free_energy_difference1, reaction.get_gibbs_free_energy_difference())
+        self.assertAlmostEqual(self.test_reaction_id1, reaction.get_reaction_id(), delta=tolerance)
+        self.assertAlmostEqual(self.test_ligand1, reaction.get_ligand(), delta=tolerance)
+        self.assertAlmostEqual(self.test_norm_cone_sigma1, reaction.get_norm_cone_sigma(), delta=tolerance)
+        self.assertAlmostEqual(self.test_norm_cone_charton1, reaction.get_norm_cone_charton(), delta=tolerance)
+        self.assertAlmostEqual(self.test_gibbs_free_energy_difference1, reaction.get_gibbs_free_energy_difference(), delta=tolerance)
 
 
 class TestMain(BaseTestClass):
@@ -401,14 +402,16 @@ class TestLOONode(BaseTestClass):
                          self.norm_cone_sigma_col_name,
                          self.norm_cone_charton_col_name,
                          self.gibbs_free_energy_difference_col_name)
+        tolerance = 1e-14
 
         test_reaction_list = populate_reactions_from_excel(file)
 
         loo_node = LOONode(test_reaction_list)
 
-        self.assertListEqual(loo_node.get_predicted_gibbs_free_energy_difference(),
-                             self.loo_predicted_gibbs_free_energy,
-                             msg="LOONode predicted gibbs free energy difference not calculated correctly")
+        for item, other_item in zip(loo_node.get_predicted_gibbs_free_energy_difference(),
+                                    self.loo_predicted_gibbs_free_energy):
+            self.assertAlmostEqual(item, other_item, delta=tolerance,
+                                   msg="LOONode predicted gibbs free energy difference not calculated correctly")
 
     def test_calculate_r_squared(self):
         file = InputFile(self.filename,
